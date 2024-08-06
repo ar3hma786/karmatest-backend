@@ -16,6 +16,9 @@ public class Sales {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @Column(name = "customer_name", nullable = false)
+    private String customerName;
 
     @Column(name = "reference_id", nullable = false, unique = true)
     private String referenceId; 
@@ -43,9 +46,6 @@ public class Sales {
     
     @Column(name = "action", nullable = false)
     private String action;
-    
-    @OneToOne
-    private User user;
 
     @PrePersist
     public void generateReferenceId() {

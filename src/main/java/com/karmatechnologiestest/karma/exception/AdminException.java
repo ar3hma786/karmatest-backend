@@ -2,9 +2,9 @@ package com.karmatechnologiestest.karma.exception;
 
 
 @SuppressWarnings("serial")
-public class UserException extends Exception {
+public class AdminException extends Exception {
 
-	public UserException(String message) {
+	public AdminException(String message) {
         super(message);
     }
 }

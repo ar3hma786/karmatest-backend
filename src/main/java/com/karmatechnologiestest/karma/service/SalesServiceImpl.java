@@ -10,12 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.karmatechnologiestest.karma.dto.SalesRequest;
 import com.karmatechnologiestest.karma.entities.Sales;
-import com.karmatechnologiestest.karma.entities.User;
-import com.karmatechnologiestest.karma.enums.ROLE;
 import com.karmatechnologiestest.karma.exception.SalesException;
-import com.karmatechnologiestest.karma.exception.UserException;
 import com.karmatechnologiestest.karma.repository.SalesRepository;
-import com.karmatechnologiestest.karma.repository.UserRepository;
 
 @Service
 public class SalesServiceImpl implements SalesService {
@@ -23,8 +19,6 @@ public class SalesServiceImpl implements SalesService {
     @Autowired
     private SalesRepository salesRepository;
 
-    @Autowired
-    private UserRepository userRepository;
 
     @Override
     public List<Sales> findAllSales() throws SalesException {
@@ -36,15 +30,15 @@ public class SalesServiceImpl implements SalesService {
     }
 
     @Override
-    public Sales createSale(SalesRequest salesRequest, User user) throws UserException, SalesException {
-        User existingUser = userRepository.findById(user.getUserId())
-                .orElseThrow(() -> new UserException("User not found."));
-
-        if (!existingUser.getRole().equals(ROLE.ADMIN)) {
-            throw new UserException("Only admin users can create sales.");
+    public Sales createSale(SalesRequest salesRequest) throws SalesException {
+        // Check if a sale with the same reference ID already exists
+        Sales existingSale = salesRepository.findByReferenceId(salesRequest.getReferenceId());
+        if (existingSale != null) {
+            throw new SalesException("Sale with this reference ID already exists.");
         }
 
         Sales newSale = new Sales();
+        newSale.setCustomerName(salesRequest.getCustomerName());
         newSale.setReferenceId(salesRequest.getReferenceId());
         newSale.setLocalDateTime(salesRequest.getLocalDateTime());
         newSale.setStatus(salesRequest.getStatus());
@@ -54,23 +48,15 @@ public class SalesServiceImpl implements SalesService {
         newSale.setPaymentStatus(salesRequest.getPaymentStatus());
         newSale.setBiller("Admin");
         newSale.setAction(salesRequest.getAction());
-        newSale.setUser(existingUser);
 
         return salesRepository.save(newSale);
     }
 
     @Override
-    public Sales updateSale(SalesRequest salesRequest, Long salesId, User user) throws UserException, SalesException {
-        User existingUser = userRepository.findById(user.getUserId())
-                .orElseThrow(() -> new UserException("User not found."));
-
-        if (!existingUser.getRole().equals(ROLE.ADMIN)) {
-            throw new UserException("Only admin users can update sales.");
-        }
-
+    public Sales updateSale(SalesRequest salesRequest, Long salesId) throws SalesException {
         Sales sale = salesRepository.findById(salesId)
                 .orElseThrow(() -> new SalesException("Sale not found."));
-
+        sale.setCustomerName(salesRequest.getCustomerName());
         sale.setLocalDateTime(salesRequest.getLocalDateTime());
         sale.setStatus(salesRequest.getStatus());
         sale.setGrandTotal(salesRequest.getGrandTotal());
@@ -79,7 +65,6 @@ public class SalesServiceImpl implements SalesService {
         sale.setPaymentStatus(salesRequest.getPaymentStatus());
         sale.setBiller("Admin");
         sale.setAction(salesRequest.getAction());
-        sale.setUser(existingUser);
 
         return salesRepository.save(sale);
     }
@@ -95,19 +80,6 @@ public class SalesServiceImpl implements SalesService {
         Sales sale = findSaleById(id);
         salesRepository.delete(sale);
     }
-
-//    @Override
-//    public List<Sales> findSalesByUserId(Long userId) throws UserException, SalesException {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new UserException("User not found."));
-//
-//        List<Sales> salesList = salesRepository.findByUserId(userId);
-//        if (salesList.isEmpty()) {
-//            throw new SalesException("No sales found for this user.");
-//        }
-//
-//        return salesList;
-//    }
 
     @Override
     public List<Sales> findSalesByDate(String startDate, String endDate) throws SalesException {
@@ -173,15 +145,12 @@ public class SalesServiceImpl implements SalesService {
     }
 
     @Override
-    public List<User> searchByCustomerName(String query) {
-        return userRepository.findAll().stream()
-                .filter(user -> user.getFirstName().toLowerCase().contains(query.toLowerCase()) ||
-                                user.getLastName().toLowerCase().contains(query.toLowerCase()))
+    public List<Sales> searchByQuery(String query) {
+        // Implement the search logic based on the query parameter
+        // For example, you might search by customer name or reference ID
+        return salesRepository.findAll().stream()
+                .filter(sale -> sale.getCustomerName().contains(query) || 
+                                sale.getReferenceId().contains(query))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Sales> searchBySalesDetails(String query) {
-        return salesRepository.findBySalesDetails(query);
     }
 }

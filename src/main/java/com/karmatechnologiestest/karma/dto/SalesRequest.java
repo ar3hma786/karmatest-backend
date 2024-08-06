@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SalesRequest {
 
+    private String customerName;
 	private String referenceId;
     private LocalDateTime localDateTime;
     private String status;

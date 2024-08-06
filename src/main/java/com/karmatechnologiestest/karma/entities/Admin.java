@@ -2,6 +2,7 @@ package com.karmatechnologiestest.karma.entities;
 
 import java.time.LocalDateTime;
 
+
 import com.karmatechnologiestest.karma.enums.ROLE;
 
 import jakarta.persistence.Column;
@@ -11,8 +12,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "users") 
-public class User {
+public class Admin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,23 +47,4 @@ public class User {
     @Column(name = "DATETIME", nullable = false)
     private LocalDateTime datetime;
 
-    @OneToOne
-    @JoinColumn(name = "SALE_ID", referencedColumnName = "reference_id")
-    private Sales sale;
-
-    public Sales getSale() {
-        if (role == ROLE.USER) {
-            return sale;
-        } else {
-            return null;
-        }
-    }
-
-    public void setSale(Sales sale) {
-        if (role == ROLE.USER) {
-            this.sale = sale;
-        } else {
-            throw new UnsupportedOperationException("Only users with ROLE.USER can have a sale.");
-        }
-    }
 }

@@ -9,18 +9,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.karmatechnologiestest.karma.entities.User;
-import com.karmatechnologiestest.karma.repository.UserRepository;
+import com.karmatechnologiestest.karma.entities.Admin;
+import com.karmatechnologiestest.karma.repository.AdminRepository;
 
 
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-	    private UserRepository userRepository;
+	    private AdminRepository userRepository;
 		
 
-		public CustomUserDetailsService(UserRepository userRepository) {
+		public CustomUserDetailsService(AdminRepository userRepository) {
 			super();
 			this.userRepository = userRepository;
 		}
@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 		@Override
 		public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 			
-			User user = userRepository.findByUsername(username);
+			Admin user = userRepository.findByUsername(username);
 			
 			if(user == null) {
 				throw new UsernameNotFoundException("user not found with email "+username);

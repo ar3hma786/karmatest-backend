@@ -12,8 +12,8 @@ import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 public class GlobalException {
 
-	@ExceptionHandler(UserException.class)
-	public ResponseEntity<ErrorDetails> handleUserException(UserException userException, WebRequest request){
+	@ExceptionHandler(AdminException.class)
+	public ResponseEntity<ErrorDetails> handleUserException(AdminException userException, WebRequest request){
 		ErrorDetails errorDetails = new ErrorDetails(userException.getMessage(), request.getDescription(false), LocalDateTime.now());
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.BAD_REQUEST);
 	}

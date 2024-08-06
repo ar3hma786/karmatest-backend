@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karmatechnologiestest.karma.config.JwtProvider;
-import com.karmatechnologiestest.karma.entities.User;
+import com.karmatechnologiestest.karma.entities.Admin;
 import com.karmatechnologiestest.karma.enums.ROLE;
-import com.karmatechnologiestest.karma.exception.UserException;
-import com.karmatechnologiestest.karma.repository.UserRepository;
+import com.karmatechnologiestest.karma.exception.AdminException;
+import com.karmatechnologiestest.karma.repository.AdminRepository;
 import com.karmatechnologiestest.karma.request.LoginRequest;
 import com.karmatechnologiestest.karma.response.AuthResponse;
 import com.karmatechnologiestest.karma.service.CustomUserDetailsService;
@@ -30,13 +30,13 @@ import jakarta.validation.Valid;
 @RequestMapping("/auth")
 public class AuthController {
    
-	private UserRepository userRepository;
+	private AdminRepository userRepository;
 	private PasswordEncoder passwordEncoder;
 	private JwtProvider jwtTokenProvider;
 	private CustomUserDetailsService customUserDetails;
 	
 
-	public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProvider jwtTokenProvider,
+	public AuthController(AdminRepository userRepository, PasswordEncoder passwordEncoder, JwtProvider jwtTokenProvider,
 			CustomUserDetailsService customUserDetails) {
 		super();
 		this.userRepository = userRepository;
@@ -46,7 +46,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<AuthResponse> createUserHandler(@Valid @RequestBody User user) throws UserException{
+	public ResponseEntity<AuthResponse> createUserHandler(@Valid @RequestBody Admin user) throws AdminException{
 		
 		  	String username = user.getUsername();
 	        String password = user.getPassword();
@@ -56,16 +56,16 @@ public class AuthController {
 	        System.out.println(createdAt);
 	        ROLE role=user.getRole();
 	        
-	        User isEmailExist=userRepository.findByUsername(username);
+	        Admin isEmailExist=userRepository.findByUsername(username);
 
 	       
 	        if (isEmailExist!=null) {
 	        	
-	            throw new UserException("Email Is Already Used With Another Account");
+	            throw new AdminException("Email Is Already Used With Another Account");
 	        }
 
 	        // Create new user
-			User createdUser= new User();
+			Admin createdUser= new Admin();
 			createdUser.setFirstName(firstName);
 			createdUser.setLastName(lastName);
 			createdUser.setUsername(username);
@@ -73,7 +73,7 @@ public class AuthController {
 	        createdUser.setDatetime(createdAt);
 	        createdUser.setRole(role);
 	        
-	        User savedUser= userRepository.save(createdUser);
+	        Admin savedUser= userRepository.save(createdUser);
 	        System.out.println(savedUser);
 
 	        Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
