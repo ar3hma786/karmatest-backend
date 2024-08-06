@@ -84,13 +84,13 @@ public class SalesController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Sales> updateSale(@PathVariable Long id, @RequestBody SalesRequest salesRequest, @RequestHeader("Authorization") String jwt) {
+    public ResponseEntity<Sales> updateSale(@PathVariable Long id, @RequestBody Sales sales, @RequestHeader("Authorization") String jwt) {
         try {
             Admin admin = adminService.findUserProfileByJwt(jwt);
             if (admin == null) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
-            Sales updatedSale = salesService.updateSale(salesRequest, id);
+            Sales updatedSale = salesService.updateSale(id, sales);
             return new ResponseEntity<>(updatedSale, HttpStatus.OK);
         } catch (AdminException e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -98,4 +98,5 @@ public class SalesController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

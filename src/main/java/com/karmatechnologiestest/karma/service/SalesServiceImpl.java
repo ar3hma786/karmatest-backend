@@ -3,7 +3,9 @@ package com.karmatechnologiestest.karma.service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import com.karmatechnologiestest.karma.dto.SalesRequest;
 import com.karmatechnologiestest.karma.entities.Sales;
 import com.karmatechnologiestest.karma.exception.SalesException;
 import com.karmatechnologiestest.karma.repository.SalesRepository;
+
 
 @Service
 public class SalesServiceImpl implements SalesService {
@@ -39,35 +42,61 @@ public class SalesServiceImpl implements SalesService {
 
         Sales newSale = new Sales();
         newSale.setCustomerName(salesRequest.getCustomerName());
-        newSale.setReferenceId(salesRequest.getReferenceId());
+                                      
+        String referenceId = "SL00" + salesRequest.getReferenceId(); 
+        newSale.setReferenceId(referenceId);
         newSale.setLocalDateTime(salesRequest.getLocalDateTime());
         newSale.setStatus(salesRequest.getStatus());
         newSale.setGrandTotal(salesRequest.getGrandTotal());
         newSale.setPaid(salesRequest.getPaid());
         newSale.setDue(salesRequest.getDue());
         newSale.setPaymentStatus(salesRequest.getPaymentStatus());
-        newSale.setBiller("Admin");
+        newSale.setBiller(salesRequest.getBiller());
         newSale.setAction(salesRequest.getAction());
 
         return salesRepository.save(newSale);
     }
+    
+    public Sales updateSale(Long id, Sales newSale) throws SalesException {
+        System.out.println("Attempting to update Sale with ID: " + id);
+        Optional<Sales> optionalSale = salesRepository.findById(id);
+        if (optionalSale.isPresent()) {
+            Sales existingSale = optionalSale.get();
 
-    @Override
-    public Sales updateSale(SalesRequest salesRequest, Long salesId) throws SalesException {
-        Sales sale = salesRepository.findById(salesId)
-                .orElseThrow(() -> new SalesException("Sale not found."));
-        sale.setCustomerName(salesRequest.getCustomerName());
-        sale.setLocalDateTime(salesRequest.getLocalDateTime());
-        sale.setStatus(salesRequest.getStatus());
-        sale.setGrandTotal(salesRequest.getGrandTotal());
-        sale.setPaid(salesRequest.getPaid());
-        sale.setDue(salesRequest.getDue());
-        sale.setPaymentStatus(salesRequest.getPaymentStatus());
-        sale.setBiller("Admin");
-        sale.setAction(salesRequest.getAction());
+            if (newSale.getAction() != null) {
+                existingSale.setAction(newSale.getAction());
+            } else {
+                throw new SalesException("Action cannot be null");
+            }
 
-        return salesRepository.save(sale);
+            existingSale.setBiller(newSale.getBiller());
+            existingSale.setCustomerName(newSale.getCustomerName());
+            existingSale.setDue(newSale.getDue());
+            existingSale.setGrandTotal(newSale.getGrandTotal());
+            existingSale.setPaid(newSale.getPaid());
+            existingSale.setPaymentStatus(newSale.getPaymentStatus());
+            existingSale.setReferenceId(newSale.getReferenceId());
+            existingSale.setLocalDateTime(newSale.getLocalDateTime());
+            existingSale.setStatus(newSale.getStatus());
+
+            System.out.println("Updated Sale: " + existingSale);
+
+            try {
+                Sales updatedSale = salesRepository.save(existingSale);
+                System.out.println("Sale updated successfully: " + updatedSale);
+                return updatedSale;
+            } catch (Exception e) {
+                System.err.println("Error while saving updated sale: " + e.getMessage());
+                throw new SalesException("Error while saving updated sale");
+            }
+        } else {
+            System.out.println("Sale with ID: " + id + " not found.");
+            throw new SalesException("Sale not found with id " + id);
+        }
     }
+
+
+
 
     @Override
     public Sales findSaleById(Long id) throws SalesException {

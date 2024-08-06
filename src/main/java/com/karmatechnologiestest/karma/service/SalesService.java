@@ -28,7 +28,7 @@ public interface SalesService {
     
     public List<Sales> searchByQuery(String query);
     
-	public Sales updateSale(SalesRequest salesRequest, Long salesId) throws SalesException;
+    public Sales updateSale(Long id, Sales newSale) throws SalesException;
 
 
     

@@ -47,8 +47,4 @@ public class Sales {
     @Column(name = "action", nullable = false)
     private String action;
 
-    @PrePersist
-    public void generateReferenceId() {
-        this.referenceId = "SL0-" + (100 + this.id);
-    }
 }
