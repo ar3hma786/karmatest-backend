@@ -34,7 +34,8 @@ public class SalesController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    
+    
     @PostMapping
     public ResponseEntity<Sales> createSale(@RequestBody SalesRequest salesRequest, @RequestHeader("Authorization") String jwt) {
         try {
